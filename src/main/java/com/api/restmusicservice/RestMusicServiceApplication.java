@@ -9,5 +9,4 @@ public class RestMusicServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(RestMusicServiceApplication.class, args);
     }
-
 }
