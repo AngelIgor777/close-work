@@ -22,83 +22,25 @@ import java.util.List;
 public class MusicController {
     private final MusicService musicService;
 
-    @GetMapping("/music/genre/classical")
-    public List<MusicDataDto> getClassicMusic() {
-        return musicService.classicalMusic();
-    }
 
-    @GetMapping("/hello")
-    public String helloWorld() {
-        return "HELLO WORLD";
-    }
-
-
-    @GetMapping("/music/genre/pop")
-    public List<MusicDataDto> getPopMusic() {
-        return musicService.popMusic();
-    }
-
-
-    @GetMapping("/music/genre/popular")
-    public List<MusicDataDto> getPopularMusic() {
-        return musicService.popularMusic();
-    }
-
-    @GetMapping("/music/genre/vocal")
-    public List<MusicDataDto> getVocalMusic() {
-        return musicService.vocalMusic();
-    }
-
-
-//    @GetMapping("/abc")
-//    public String abc() {
-//        return "Gabi I LOVE YOU!!! \n Жду тебя дома)))";
-//    }
-
-//    @GetMapping("/track/{trackid}")
-//    public ResponseEntity<InputStreamResource> getMusicURLByTrackId(@PathVariable Long trackid) {
-//        try {
-//            InputStream musicStream = musicService.getMusicByTrackId(trackid);
-//            return ResponseEntity.ok()
-//                    .header(HttpHeaders.CONTENT_TYPE, "audio/mpeg")
-//                    .body(new InputStreamResource(musicStream));
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
-//    }
-
-
-    @GetMapping("/music/genre/rap")
-    public ResponseEntity<List<MusicDataDto>> getRapMusic() {
-        List<MusicDataDto> musicLocalList = musicService.getMusicLocalList();
-        return ResponseEntity.ok(musicLocalList);
+    @GetMapping("/music/genre/{genre}")
+    public List<MusicDataDto> getPopularMusic(@PathVariable("genre") String genre) {
+        if (genre.equals("popular")) {
+            return musicService.getMusicByGenreName("");
+        } else if (genre.equals("rap")) {
+            return musicService.getMusicByGenreName("rap");
+        } else if (genre.equals("pop")) {
+            return musicService.getMusicByGenreName("pop");
+        } else if (genre.equals("club")) {
+            return musicService.getMusicByGenreName("club");
+        } else if (genre.equals("classic")) {
+            return musicService.getMusicByGenreName("classic");
+        }
+        return null;
     }
 
     @GetMapping("/track/{id}")
-    public ResponseEntity<Resource> getSong(@PathVariable long id) {
-        List<MusicDataDto> musicLocalList = musicService.getMusicLocalList();
-        Resource resource = null;
-        for (MusicDataDto musicDataDto : musicLocalList) {
-            if (musicDataDto.getSoundId().equals(String.valueOf(id))) {
-
-                resource = new ClassPathResource(musicDataDto.getMusicUrlInResources());
-            }
-        }
-        try {
-            // Указываем путь относительно папки "resources"
-
-
-            if (resource.exists()) {
-                return ResponseEntity.ok()
-                        .contentType(MediaType.parseMediaType("audio/mpeg"))
-                        .body(resource);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    public MusicDataDto getMusicById(@PathVariable("id") Long id) {
+        return musicService.getMusicById(id);
     }
-
 }
