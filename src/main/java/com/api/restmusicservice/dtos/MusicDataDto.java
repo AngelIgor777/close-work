@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 public class MusicDataDto {
-    private Long soundId;
+    private Long soundid;
     private String title;
     private String artistName;
     private String genre;

@@ -13,7 +13,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "authors", schema = "music")
+@Table(name = "author", schema = "music")
 public class Author {
 
     @Id
@@ -21,7 +21,7 @@ public class Author {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "author_name", nullable = false, unique = true, length = 256)
+    @Column(name = "name", nullable = false, unique = true, length = 256)
     private String authorName;
 
     @OneToMany(mappedBy = "artist")

@@ -23,17 +23,17 @@ public class MusicController {
     private final MusicService musicService;
 
 
-    @GetMapping("/music/genre/{genre}")
+    @GetMapping("music/genre/{genre}")
     public List<MusicDataDto> getPopularMusic(@PathVariable("genre") String genre) {
         if (genre.equals("popular")) {
-            return musicService.getMusicByGenreName("");
+            return musicService.getMusicByGenreName("popular");
         } else if (genre.equals("rap")) {
             return musicService.getMusicByGenreName("rap");
         } else if (genre.equals("pop")) {
             return musicService.getMusicByGenreName("pop");
         } else if (genre.equals("club")) {
             return musicService.getMusicByGenreName("club");
-        } else if (genre.equals("classic")) {
+        }else if (genre.equals("classic")) {
             return musicService.getMusicByGenreName("classic");
         }
         return null;

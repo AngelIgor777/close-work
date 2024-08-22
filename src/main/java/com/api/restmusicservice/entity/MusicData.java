@@ -18,6 +18,7 @@ public class MusicData {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
     @Column(name = "title", nullable = false, length = 256)
     private String title;
 

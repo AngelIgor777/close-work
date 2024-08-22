@@ -1,7 +1,6 @@
 package com.api.restmusicservice.service;
 
 import com.api.restmusicservice.dtos.MusicDataDto;
-import com.api.restmusicservice.entity.Genre;
 import com.api.restmusicservice.entity.MusicData;
 import com.api.restmusicservice.repository.MusicDataRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,13 +35,11 @@ public class MusicService {
         if (musicData.getGenre().getName().isEmpty()) {
             musicData.getGenre().setName("Popular");
         }
-
-
         return MusicDataDto.builder().musicUrl(musicData.getMusicUrl())
                 .genre(musicData.getGenre().getName())
                 .title(musicData.getTitle())
                 .artistName(musicData.getArtist().getAuthorName())
-                .soundId(musicData.getId())
+                .soundid(musicData.getId())
                 .coverSmallURL(musicData.getCover().getCoverSmallUrl())
                 .coverMediumURL(musicData.getCover().getCoverMediumUrl())
                 .durationSeconds(musicData.getDurationSeconds()).build();
