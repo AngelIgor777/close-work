@@ -1,19 +1,15 @@
 package com.api.restmusicservice.controllers;
 
 import com.api.restmusicservice.dtos.MusicDataDto;
+import com.api.restmusicservice.exceptions.ErrorResponse;
+import com.api.restmusicservice.exceptions.MusicDataNotFoundException;
 import com.api.restmusicservice.service.MusicService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -24,23 +20,39 @@ public class MusicController {
 
 
     @GetMapping("music/genre/{genre}")
-    public List<MusicDataDto> getPopularMusic(@PathVariable("genre") String genre) {
-        if (genre.equals("popular")) {
-            return musicService.getMusicByGenreName("popular");
-        } else if (genre.equals("rap")) {
-            return musicService.getMusicByGenreName("rap");
-        } else if (genre.equals("pop")) {
-            return musicService.getMusicByGenreName("pop");
-        } else if (genre.equals("club")) {
-            return musicService.getMusicByGenreName("club");
-        }else if (genre.equals("classic")) {
-            return musicService.getMusicByGenreName("classic");
+    public ResponseEntity<?> getPopularMusic(@PathVariable("genre") String genre) {
+        try {
+            List<MusicDataDto> musicDataDtos = switch (genre) {
+                case "popular" -> musicService.getMusicByGenreName("popular");
+                case "rap" -> musicService.getMusicByGenreName("rap");
+                case "pop" -> musicService.getMusicByGenreName("pop");
+                case "club" -> musicService.getMusicByGenreName("club");
+                case "classic" -> musicService.getMusicByGenreName("classic");
+                default -> throw new MusicDataNotFoundException("Invalid genre: " + genre);
+            };
+            return new ResponseEntity<>(musicDataDtos, HttpStatus.OK);
+
+        } catch (MusicDataNotFoundException musicDataNotFoundException) {
+            ErrorResponse errorResponse = new ErrorResponse(musicDataNotFoundException.getClass().getSimpleName(), musicDataNotFoundException.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
         }
-        return null;
     }
 
     @GetMapping("/track/{id}")
-    public MusicDataDto getMusicById(@PathVariable("id") Long id) {
-        return musicService.getMusicById(id);
+    public ResponseEntity<?> getMusicById(@PathVariable("id") Long id) {
+        try {
+            return new ResponseEntity<>(musicService.getMusicById(id), HttpStatus.OK);
+        } catch (MusicDataNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/existMusic/{id}")
+    public ResponseEntity<?> musicExistById(@PathVariable("id") Long id) {
+        try {
+            return new ResponseEntity<>(musicService.existMusicDataById(id), HttpStatus.OK);
+        } catch (MusicDataNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 }
