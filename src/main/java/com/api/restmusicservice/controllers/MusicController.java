@@ -1,51 +1,92 @@
 package com.api.restmusicservice.controllers;
 
-import com.api.restmusicservice.dtos.MusicDataDto;
-import com.api.restmusicservice.entity.MusicData;
-import com.api.restmusicservice.exceptions.ErrorResponse;
-import com.api.restmusicservice.exceptions.MusicDataNotFoundException;
+import com.api.restmusicservice.service.AllMusicGenresUrlService;
 import com.api.restmusicservice.service.GenreService;
-import com.api.restmusicservice.service.MusicService;
 import com.api.restmusicservice.service.SearchService;
 import com.api.restmusicservice.service.TrackService;
-import com.api.restmusicservice.wrappers.ResponseEntityWrapper;
+import com.api.restmusicservice.wrappers.ResponseData;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
+/**
+ * Контроллер {@code MusicController} предоставляет API для взаимодействия с музыкальными данными.
+ *
+ * <p>Обрабатывает запросы, связанные с жанрами музыки, треками и поиском музыки.</p>
+ *
+ * <p>Маршрут API: {@code /api/v1}</p>
+ */
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1")
 public class MusicController {
+
     private final GenreService genreService;
     private final TrackService trackService;
     private final SearchService searchService;
+    private final AllMusicGenresUrlService allMusicGenresUrlService;
 
+    /**
+     * Получает музыку по указанному жанру.
+     *
+     * <p>Этот метод возвращает список объектов {@link com.api.restmusicservice.dtos.MusicDataDto}
+     * для указанного жанра. Если жанр не найден, будет выброшено исключение {@link com.api.restmusicservice.exceptions.MusicDataNotFoundException}.</p>
+     *
+     * @param genre жанр музыки для поиска. Должен соответствовать одному из жанров, обрабатываемых методом {@link GenreService#getMusicDataDtosByGenreName(String)}.
+     * @return объект {@code ResponseEntity<ResponseData>} с данными о музыке по указанному жанру.
+     * @throws com.api.restmusicservice.exceptions.MusicDataNotFoundException если жанр не существует.
+     */
     @GetMapping("music/genre/{genre}")
-    public ResponseEntity<ResponseEntityWrapper> getPopularMusic(@PathVariable("genre") String genre) {
+    public ResponseEntity<ResponseData> getPopularMusic(@PathVariable("genre") String genre) {
         return genreService.getMusicDataDtosByGenreName(genre);
     }
 
+    /**
+     * Получает информацию о треке по его уникальному идентификатору.
+     *
+     * <p>Этот метод возвращает объект {@link com.api.restmusicservice.dtos.MusicDataDto}
+     * для трека с указанным идентификатором. Если трек не найден, будет выброшено исключение {@link com.api.restmusicservice.exceptions.MusicDataNotFoundException}.</p>
+     *
+     * @param id уникальный идентификатор трека.
+     * @return объект {@code ResponseEntity<ResponseData>} с данными о треке.
+     * @throws com.api.restmusicservice.exceptions.MusicDataNotFoundException если трек с указанным идентификатором не найден.
+     */
     @GetMapping("/track/{id}")
-    public ResponseEntity<ResponseEntityWrapper> getMusicById(@PathVariable("id") Long id) {
+    public ResponseEntity<ResponseData> getMusicById(@PathVariable("id") Long id) {
         return trackService.getTrackById(id);
     }
 
+    /**
+     * Проверяет существование трека по его уникальному идентификатору.
+     *
+     * <p>Этот метод используется для проверки наличия трека и для добавления трека в избранное пользователем.</p>
+     *
+     * @param id уникальный идентификатор трека.
+     * @return объект {@code ResponseEntity<ResponseData>} с данными о существовании трека. В классе-обёртке {@link com.api.restmusicservice.dtos.ExistMusic}
+     * содержится поле {@code Boolean existMusic}.
+     */
     @GetMapping("/existTrack/{id}")
-    public ResponseEntity<ResponseEntityWrapper> musicExistById(@PathVariable("id") Long id) {
+    public ResponseEntity<ResponseData> musicExistById(@PathVariable("id") Long id) {
         return trackService.existTrackById(id);
     }
 
+    /**
+     * Выполняет поиск музыки по заданному запросу.
+     *
+     * <p>Этот метод возвращает список объектов {@link com.api.restmusicservice.dtos.MusicDataDto}
+     * соответствующих запросу. Если данных нет, возвращается пустой список.</p>
+     *
+     * @param query строка запроса для поиска музыки. Может содержать имя исполнителя, название песни и т.д.
+     * @return объект {@code ResponseEntity<ResponseData>} с результатами поиска. В случае отсутствия данных возвращается пустой список.
+     */
     @GetMapping("/findMusic/{query}")
-    public ResponseEntity<ResponseEntityWrapper> getMusicByQuery(@PathVariable("query") String query) {
-        List<MusicDataDto> musicData = searchService.searchMusic(query);
-        ResponseEntityWrapper responseEntityWrapperSearchMusicDto = new ResponseEntityWrapper(musicData);
-        return new ResponseEntity<>(responseEntityWrapperSearchMusicDto, HttpStatus.OK);
+    public ResponseEntity<ResponseData> getMusicByQuery(@PathVariable("query") String query) {
+        return searchService.searchMusic(query);
     }
 
+    @GetMapping("/music/allMusicGenres")
+    public ResponseEntity<ResponseData> getAllMusicGenres() {
+        return allMusicGenresUrlService.getAllMusicGenreUrls();
+    }
 
 }

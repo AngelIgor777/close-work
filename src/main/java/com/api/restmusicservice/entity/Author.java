@@ -27,12 +27,4 @@ public class Author {
     @OneToMany(mappedBy = "artist")
     private Set<MusicData> musicData;
 
-
-    /**
-     * Для поиска MusicData по authorName
-     * @param authorName
-     */
-    public Author(String authorName) {
-        this.authorName = authorName;
-    }
 }
