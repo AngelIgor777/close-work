@@ -37,7 +37,9 @@ public class MusicController {
      * @throws com.api.restmusicservice.exceptions.MusicDataNotFoundException если жанр не существует.
      */
     @GetMapping("music/genre/{genre}")
-    public ResponseEntity<ResponseData> getPopularMusic(@PathVariable("genre") String genre) {
+    public ResponseEntity<ResponseData> getPopularMusic(@PathVariable("genre") String genre
+//                                                        ,@RequestParam Long id //todo музыку по айди пользователя
+    ) {
         return genreService.getMusicDataDtosByGenreName(genre);
     }
 
