@@ -4,6 +4,7 @@ import com.api.restmusicservice.dtos.MusicDataDto;
 import com.api.restmusicservice.service.*;
 import com.api.restmusicservice.wrappers.ResponseData;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,7 +58,14 @@ public class MusicController {
      */
     @GetMapping("/track/{id}")
     public ResponseEntity<ResponseData> getMusicById(@PathVariable("id") Long id) {
-        return trackService.getTrackById(id);
+        ResponseData trackById = trackService.getTrackById(id);
+        return new ResponseEntity<>(trackById, HttpStatus.OK);
+    }
+
+    @PostMapping("/musicsById")
+    public ResponseEntity<List<ResponseData>> getMusicsById(@RequestBody List<Long> musicsId) {
+        List<ResponseData> musicsByMusicsId = userMusicService.getMusicsByMusicsId(musicsId);
+        return new ResponseEntity<>(musicsByMusicsId, HttpStatus.OK);
     }
 
     /**

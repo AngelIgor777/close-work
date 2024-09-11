@@ -2,7 +2,7 @@ package com.api.restmusicservice.dtos;
 
 import com.api.restmusicservice.wrappers.ResponseData;
 import com.fasterxml.jackson.annotation.JsonValue;
-import lombok.Data;
+import lombok.Builder;
 import lombok.Setter;
 
 import java.util.List;
@@ -12,6 +12,7 @@ import java.util.List;
  * <p>Используется для ограничения возвращаемого типа в {@code ResponseEntity<ResponseData>}</p>
  */
 @Setter
+@Builder
 public class MusicDataDtoList implements ResponseData {
 
     private List<MusicDataDto> musicDataDtos;

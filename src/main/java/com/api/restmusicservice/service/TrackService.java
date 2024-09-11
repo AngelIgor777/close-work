@@ -38,19 +38,19 @@ public class TrackService {
      * или с объектом {@link ErrorResponse} и HTTP статусом {@code 404 Not Found}, если трек не найден.
      * @throws MusicDataNotFoundException
      */
-    public ResponseEntity<ResponseData> getTrackById(Long id) {
+    public ResponseData getTrackById(Long id) {
         try {
             Optional<MusicData> musicData = musicDataRepository.findById(id);
             if (musicData.isPresent()) {
                 MusicDataDto musicDataDto = converterMusicData.converMusicDataToMusicDataDto(musicData.get());
 
-                return new ResponseEntity<>(musicDataDto, HttpStatus.OK);
+                return musicDataDto;
             } else {
                 throw new MusicDataNotFoundException("Music data with id " + id + "not found id database");
             }
         } catch (MusicDataNotFoundException e) {
             ErrorResponse errorResponse = new ErrorResponse(e.getClass().getSimpleName(), e.getMessage());
-            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+            return errorResponse;
         }
     }
 

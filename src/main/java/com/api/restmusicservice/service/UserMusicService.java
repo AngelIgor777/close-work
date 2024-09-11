@@ -12,11 +12,13 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserMusicService {
     private final RestTemplate restTemplate;
+    private final TrackService trackService;
 
     public ResponseEntity<ResponseData> getUserMusicByUserId(Long id, List<MusicDataDto> musicDataDtoList) {
         System.out.println(musicDataDtoList);
@@ -55,4 +57,8 @@ public class UserMusicService {
         }
     }
 
+    public List<ResponseData> getMusicsByMusicsId(List<Long> musicsId) {
+        return musicsId.stream()
+                .map(trackService::getTrackById).collect(Collectors.toList());
+    }
 }
