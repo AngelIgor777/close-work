@@ -7,9 +7,7 @@ import com.api.restmusicservice.entity.MusicData;
 import com.api.restmusicservice.exceptions.ErrorResponse;
 import com.api.restmusicservice.exceptions.MusicDataNotFoundException;
 import com.api.restmusicservice.repository.MusicDataRepository;
-import com.api.restmusicservice.wrappers.ResponseData;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
  * Сервис для работы с музыкальными данными, предоставляющий методы для получения данных о музыке по жанру.
  *
  * <p>Этот класс использует {@link MusicDataRepository} для извлечения данных из базы данных и {@link ConverterMusicData}
@@ -41,7 +38,7 @@ public class GenreService {
      * либо с объектом {@link ErrorResponse} и HTTP статусом {@code 404 Not Found} при ошибке.
      * @throws MusicDataNotFoundException если жанр недействителен.
      */
-    public ResponseEntity<ResponseData> getMusicDataDtosByGenreName(String genre) {
+    public List<MusicDataDto> getMusicDataDtosByGenreName(String genre) {
         try {
             List<MusicDataDto> musicDataDtos = switch (genre) {
                 case "popular" -> getMusicByGenreName("popular");
@@ -54,10 +51,9 @@ public class GenreService {
                 case "tiktok" -> getMusicByGenreName("music-from-tik-tok");
                 default -> throw new MusicDataNotFoundException("Invalid genre: " + genre);
             };
-            return new ResponseEntity<>(new MusicDataDtoList(musicDataDtos), HttpStatus.OK);
+            return musicDataDtos;
         } catch (MusicDataNotFoundException musicDataNotFoundException) {
-            ErrorResponse errorResponse = new ErrorResponse(musicDataNotFoundException.getClass().getSimpleName(), musicDataNotFoundException.getMessage());
-            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+            throw new RuntimeException(musicDataNotFoundException.getMessage());
         }
     }
 

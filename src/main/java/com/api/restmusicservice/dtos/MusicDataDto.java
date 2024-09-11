@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MusicDataDto implements ResponseData {
     private Long soundid;
-    private Long playerSoundId;
+    private String playerSoundId = "";
     private Boolean stateLike;
     private String title;
     private String artistName;

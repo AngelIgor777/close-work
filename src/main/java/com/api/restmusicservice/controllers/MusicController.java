@@ -1,13 +1,13 @@
 package com.api.restmusicservice.controllers;
 
-import com.api.restmusicservice.service.AllMusicGenresUrlService;
-import com.api.restmusicservice.service.GenreService;
-import com.api.restmusicservice.service.SearchService;
-import com.api.restmusicservice.service.TrackService;
+import com.api.restmusicservice.dtos.MusicDataDto;
+import com.api.restmusicservice.service.*;
 import com.api.restmusicservice.wrappers.ResponseData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Контроллер {@code MusicController} предоставляет API для взаимодействия с музыкальными данными.
@@ -25,6 +25,7 @@ public class MusicController {
     private final TrackService trackService;
     private final SearchService searchService;
     private final AllMusicGenresUrlService allMusicGenresUrlService;
+    private final UserMusicService userMusicService;
 
     /**
      * Получает музыку по указанному жанру.
@@ -38,9 +39,10 @@ public class MusicController {
      */
     @GetMapping("music/genre/{genre}")
     public ResponseEntity<ResponseData> getPopularMusic(@PathVariable("genre") String genre
-//                                                        ,@RequestParam Long id //todo музыку по айди пользователя
+            , @RequestParam("id") Long userId//todo музыку по айди пользователя
     ) {
-        return genreService.getMusicDataDtosByGenreName(genre);
+        List<MusicDataDto> musicDataDtosByGenreName = genreService.getMusicDataDtosByGenreName(genre);
+        return userMusicService.getUserMusicByUserId(userId, musicDataDtosByGenreName);
     }
 
     /**
@@ -86,9 +88,9 @@ public class MusicController {
         return searchService.searchMusic(query);
     }
 
+    //todo доделать доступ ко всем плейлистам и жанрам
     @GetMapping("/music/allMusicGenres")
     public ResponseEntity<ResponseData> getAllMusicGenres() {
         return allMusicGenresUrlService.getAllMusicGenreUrls();
     }
-
 }
