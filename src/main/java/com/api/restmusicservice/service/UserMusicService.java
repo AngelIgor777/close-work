@@ -4,8 +4,8 @@ import com.api.restmusicservice.dtos.MusicDataDto;
 import com.api.restmusicservice.dtos.MusicDataDtoList;
 import com.api.restmusicservice.wrappers.ResponseData;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -20,14 +20,19 @@ public class UserMusicService {
     private final RestTemplate restTemplate;
     private final TrackService trackService;
 
-    public ResponseEntity<ResponseData> getUserMusicByUserId(Long id, List<MusicDataDto> musicDataDtoList) {
-        System.out.println(musicDataDtoList);
-        try {
-            // Формируем URL для получения списка понравившейся музыки по ID пользователя
-            String URL = "http://localhost:8080/api/v2/showLikedMusic/" + id;
+    @Value("${url-For-Show-Liked-MusicId}")
+    String urlForShowLikedMusicId;
 
-            // Делаем запрос к User сервису для получения списка ID понравившейся музыки
-            HashMap<String, List<Long>> musicsId = restTemplate.getForObject(URL, HashMap.class);
+    public ResponseEntity<ResponseData> getUserMusicByUserId(List<MusicDataDto> musicDataDtoList, String userToken) {
+        try {
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(userToken);  // Добавление заголовка Authorization: Bearer {token}
+            // Создание HttpEntity с заголовками
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<HashMap> response = restTemplate.exchange(urlForShowLikedMusicId, HttpMethod.GET, entity, HashMap.class);
+            HashMap<String, List<Long>> musicsId = response.getBody();
 
             // Проверяем, что ответ не пустой и содержит ключ likedMusicsId
             if (musicsId == null || !musicsId.containsKey("likedMusicsId")) {
@@ -36,18 +41,14 @@ public class UserMusicService {
 
             // Извлекаем список ID понравившейся музыки
             List<Long> musicsIdList = musicsId.get("likedMusicsId");
-            System.out.println(musicsIdList);
 
             // Обновляем stateLike для музыки в переданном списке
             for (MusicDataDto musicDataDto : musicDataDtoList) {
                 if (musicsIdList.contains(musicDataDto.getSoundid().intValue())) {
-                    System.out.println(musicDataDto);
                     musicDataDto.setStateLike(true); // Устанавливаем лайк
                 }
             }
 
-            System.out.println("after");
-            System.out.println(musicDataDtoList);
             // Возвращаем обновленный список
             return ResponseEntity.ok(new MusicDataDtoList(musicDataDtoList));
 

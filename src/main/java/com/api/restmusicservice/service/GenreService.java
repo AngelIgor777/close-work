@@ -40,7 +40,7 @@ public class GenreService {
      */
     public List<MusicDataDto> getMusicDataDtosByGenreName(String genre) {
         try {
-            List<MusicDataDto> musicDataDtos = switch (genre) {
+            return switch (genre) {
                 case "popular" -> getMusicByGenreName("popular");
                 case "rap" -> getMusicByGenreName("rap");
                 case "pop" -> getMusicByGenreName("pop");
@@ -51,7 +51,6 @@ public class GenreService {
                 case "tiktok" -> getMusicByGenreName("music-from-tik-tok");
                 default -> throw new MusicDataNotFoundException("Invalid genre: " + genre);
             };
-            return musicDataDtos;
         } catch (MusicDataNotFoundException musicDataNotFoundException) {
             throw new RuntimeException(musicDataNotFoundException.getMessage());
         }
@@ -74,4 +73,6 @@ public class GenreService {
         }
         return musicDataDtos;
     }
+
+
 }

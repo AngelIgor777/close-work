@@ -4,10 +4,12 @@ import com.api.restmusicservice.dtos.MusicDataDto;
 import com.api.restmusicservice.service.*;
 import com.api.restmusicservice.wrappers.ResponseData;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -18,6 +20,7 @@ import java.util.List;
  * <p>Маршрут API: {@code /api/v1}</p>
  */
 @RequiredArgsConstructor
+@Slf4j
 @RestController
 @RequestMapping("/api/v1")
 public class MusicController {
@@ -27,6 +30,7 @@ public class MusicController {
     private final SearchService searchService;
     private final AllMusicGenresUrlService allMusicGenresUrlService;
     private final UserMusicService userMusicService;
+    private final AllMusicService allMusicService;
 
     /**
      * Получает музыку по указанному жанру.
@@ -40,11 +44,18 @@ public class MusicController {
      */
     @GetMapping("music/genre/{genre}")
     public ResponseEntity<ResponseData> getPopularMusic(@PathVariable("genre") String genre
-            , @RequestParam("id") Long userId//todo музыку по айди пользователя
+            , @RequestHeader("Authorization") String token
     ) {
+        log.info("Запрос -> 'music/genre/{genre}'");
+
+        // Извлекаем токен без префикса "Bearer "
+        String userToken = token.startsWith("Bearer ") ? token.substring(7) : token;
         List<MusicDataDto> musicDataDtosByGenreName = genreService.getMusicDataDtosByGenreName(genre);
-        return userMusicService.getUserMusicByUserId(userId, musicDataDtosByGenreName);
+        ResponseEntity<ResponseData> userMusicByUserId = userMusicService.getUserMusicByUserId(musicDataDtosByGenreName, userToken);
+        log.info("Ответ <- 'music/genre/{genre}'");
+        return userMusicByUserId;
     }
+
 
     /**
      * Получает информацию о треке по его уникальному идентификатору.
@@ -58,12 +69,19 @@ public class MusicController {
      */
     @GetMapping("/track/{id}")
     public ResponseEntity<ResponseData> getMusicById(@PathVariable("id") Long id) {
+        log.info("Запрос  -> '/track/{id}'");
+
         ResponseData trackById = trackService.getTrackById(id);
-        return new ResponseEntity<>(trackById, HttpStatus.OK);
+        ResponseEntity<ResponseData> responseEntityMusicDataDto = new ResponseEntity<>(trackById, HttpStatus.OK);
+
+        log.info("Ответ  <- '/track/{id}'");
+        return responseEntityMusicDataDto;
     }
 
     @PostMapping("/musicsById")
     public ResponseEntity<List<ResponseData>> getMusicsById(@RequestBody List<Long> musicsId) {
+        log.info("Request to '/musicsById'");
+
         List<ResponseData> musicsByMusicsId = userMusicService.getMusicsByMusicsId(musicsId);
         return new ResponseEntity<>(musicsByMusicsId, HttpStatus.OK);
     }
@@ -79,6 +97,8 @@ public class MusicController {
      */
     @GetMapping("/existTrack/{id}")
     public ResponseEntity<ResponseData> musicExistById(@PathVariable("id") Long id) {
+        log.info("Request to '/existTrack/{id}'");
+
         return trackService.existTrackById(id);
     }
 
@@ -93,12 +113,44 @@ public class MusicController {
      */
     @GetMapping("/findMusic/{query}")
     public ResponseEntity<ResponseData> getMusicByQuery(@PathVariable("query") String query) {
+        log.info("Request to '/findMusic/{query}'");
+
         return searchService.searchMusic(query);
     }
 
-    //todo доделать доступ ко всем плейлистам и жанрам
     @GetMapping("/music/allMusicGenres")
     public ResponseEntity<ResponseData> getAllMusicGenres() {
+        log.info("Request to '/music/allMusicGenres'");
+
         return allMusicGenresUrlService.getAllMusicGenreUrls();
     }
+
+
+    @GetMapping("music/allMusic")
+    public List<MusicDataDto> getAllMusic(@RequestParam(required = false, defaultValue = "0") int page,
+                                          @RequestParam(required = false, defaultValue = "10") int size,
+                                          @RequestHeader("Authorization") String token) {
+        log.info("Request to 'music/allMusic'");
+
+
+        // Извлекаем токен без префикса "Bearer "
+        String userToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+
+        // Получаем всю музыку без учета пагинации
+        List<MusicDataDto> allMusic = allMusicService.getAllMusic(); // Предполагается, что это весь список
+
+        // Фильтруем по UserId
+        List<MusicDataDto> allMusicByUserId = allMusicService.getAllMusicByUserId(allMusic, userToken);
+
+        // Перемешиваем список
+        Collections.shuffle(allMusicByUserId);
+
+        // Реализуем пагинацию вручную
+        int start = Math.min(page * size, allMusicByUserId.size());
+        int end = Math.min(start + size, allMusicByUserId.size());
+
+        // Возвращаем нужную страницу
+        return allMusicByUserId.subList(start, end);
+    }
+
 }
