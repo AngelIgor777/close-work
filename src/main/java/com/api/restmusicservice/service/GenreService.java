@@ -39,21 +39,21 @@ public class GenreService {
      * @throws MusicDataNotFoundException если жанр недействителен.
      */
     public List<MusicDataDto> getMusicDataDtosByGenreName(String genre) {
-        try {
-            return switch (genre) {
-                case "popular" -> getMusicByGenreName("popular");
-                case "rap" -> getMusicByGenreName("rap");
-                case "pop" -> getMusicByGenreName("pop");
-                case "club" -> getMusicByGenreName("club");
-                case "classic" -> getMusicByGenreName("classic");
-                case "instrumental" -> getMusicByGenreName("instrumental");
-                case "rock" -> getMusicByGenreName("rock");
-                case "tiktok" -> getMusicByGenreName("music-from-tik-tok");
-                default -> throw new MusicDataNotFoundException("Invalid genre: " + genre);
-            };
-        } catch (MusicDataNotFoundException musicDataNotFoundException) {
-            throw new RuntimeException(musicDataNotFoundException.getMessage());
+        List<MusicDataDto> musicDataDtos = switch (genre) {
+            case "popular" -> getMusicByGenreName("popular");
+            case "rap" -> getMusicByGenreName("rap");
+            case "pop" -> getMusicByGenreName("pop");
+            case "club" -> getMusicByGenreName("club");
+            case "classic" -> getMusicByGenreName("classic");
+            case "instrumental" -> getMusicByGenreName("instrumental");
+            case "rock" -> getMusicByGenreName("rock");
+            case "tiktok" -> getMusicByGenreName("music-from-tik-tok");
+            default -> throw new MusicDataNotFoundException("Несуществующий жанр : " + genre);
+        };
+        if (musicDataDtos.isEmpty()) {
+            throw new MusicDataNotFoundException("Музыка не найдена");
         }
+        return musicDataDtos;
     }
 
     /**

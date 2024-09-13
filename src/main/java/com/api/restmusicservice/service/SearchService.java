@@ -5,9 +5,7 @@ import com.api.restmusicservice.dtos.MusicDataDto;
 import com.api.restmusicservice.dtos.MusicDataDtoList;
 import com.api.restmusicservice.entity.MusicData;
 import com.api.restmusicservice.repository.MusicDataRepository;
-import com.api.restmusicservice.wrappers.ResponseData;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +17,6 @@ import java.util.List;
  *
  * <p>Этот класс использует {@link MusicDataRepository} для извлечения данных из базы данных и {@link ConverterMusicData}
  * для преобразования сущностей {@link MusicData} в объекты {@link MusicDataDto}.</p>
- *
  */
 @Service
 @RequiredArgsConstructor
@@ -36,9 +33,9 @@ public class SearchService {
      *
      * @param query строка запроса для поиска. Может содержать фрагменты имени исполнителя или названия трека.
      * @return {@link ResponseEntity} с объектом {@link MusicDataDtoList} и HTTP статусом {@code 200 OK}.
-     *         Если нет результатов, возвращается пустой список.
+     * Если нет результатов, возвращается пустой список.
      */
-    public ResponseEntity<ResponseData> searchMusic(String query) {
+    public List<MusicDataDto> searchMusic(String query) {
         List<MusicData> musicDataByArtistContainingIgnoreCase =
                 musicDataRepository.findMusicDataByArtist_AuthorNameContainingIgnoreCase(query);
         List<MusicData> musicDataByTitleContainingIgnoreCase = musicDataRepository.findMusicDataByTitleContainingIgnoreCase(query);
@@ -47,11 +44,11 @@ public class SearchService {
         List<MusicData> combinedResults = new ArrayList<>(musicDataByArtistContainingIgnoreCase);
         combinedResults.addAll(musicDataByTitleContainingIgnoreCase);
 
-        List<MusicDataDto> searchMusicDataDto = combinedResults.stream()
+        // Возвращаем объединенный список
+        return combinedResults.stream()
                 .map(converterMusicData::converMusicDataToMusicDataDto)
                 .toList();
 
-        // Возвращаем объединенный список
-        return new ResponseEntity<>(new MusicDataDtoList(searchMusicDataDto), HttpStatus.OK);
+
     }
 }

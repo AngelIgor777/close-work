@@ -7,9 +7,7 @@ import com.api.restmusicservice.entity.MusicData;
 import com.api.restmusicservice.exceptions.ErrorResponse;
 import com.api.restmusicservice.exceptions.MusicDataNotFoundException;
 import com.api.restmusicservice.repository.MusicDataRepository;
-import com.api.restmusicservice.wrappers.ResponseData;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -38,19 +36,12 @@ public class TrackService {
      * или с объектом {@link ErrorResponse} и HTTP статусом {@code 404 Not Found}, если трек не найден.
      * @throws MusicDataNotFoundException
      */
-    public ResponseData getTrackById(Long id) {
-        try {
-            Optional<MusicData> musicData = musicDataRepository.findById(id);
-            if (musicData.isPresent()) {
-                MusicDataDto musicDataDto = converterMusicData.converMusicDataToMusicDataDto(musicData.get());
-
-                return musicDataDto;
-            } else {
-                throw new MusicDataNotFoundException("Music data with id " + id + "not found id database");
-            }
-        } catch (MusicDataNotFoundException e) {
-            ErrorResponse errorResponse = new ErrorResponse(e.getClass().getSimpleName(), e.getMessage());
-            return errorResponse;
+    public MusicDataDto getTrackById(Long id) {
+        Optional<MusicData> musicData = musicDataRepository.findById(id);
+        if (musicData.isPresent()) {
+            return converterMusicData.converMusicDataToMusicDataDto(musicData.get());
+        } else {
+            throw new MusicDataNotFoundException("Песня с ID '" + id + "' не найдена");
         }
     }
 
@@ -62,12 +53,12 @@ public class TrackService {
      * если {@link ExistMusic} имеет поле {@code existMusic} равное {@code true}.
      * Иначе {@code 404 NOT FOUND}.
      */
-    public ResponseEntity<ResponseData> existTrackById(Long id) {
+    public ExistMusic existTrackById(Long id) {
         Boolean existsMusicDataById = musicDataRepository.existsMusicDataById(id);
-        ExistMusic existMusic = new ExistMusic(existsMusicDataById);
         if (existsMusicDataById) {
-            return new ResponseEntity<>(existMusic, HttpStatus.OK);
+            return new ExistMusic(existsMusicDataById);
+        } else {
+            throw new MusicDataNotFoundException("Музыка с ID '" + id + "' не найден");
         }
-        return new ResponseEntity<>(existMusic, HttpStatus.NOT_FOUND);
     }
 }
