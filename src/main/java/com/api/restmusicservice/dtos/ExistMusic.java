@@ -1,6 +1,5 @@
 package com.api.restmusicservice.dtos;
 
-import com.api.restmusicservice.wrappers.ResponseData;
 import lombok.Data;
 
 /**
@@ -9,7 +8,7 @@ import lombok.Data;
  * <p>Используется для ограничения возвращаемого типа в {@code ResponseEntity<ResponseData>}</p>
  */
 @Data
-public class ExistMusic implements ResponseData {
+public class ExistMusic  {
 
     /**
      * @value поле описывает наличие песни в базе данных

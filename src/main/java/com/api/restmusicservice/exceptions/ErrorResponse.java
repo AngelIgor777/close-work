@@ -1,6 +1,5 @@
 package com.api.restmusicservice.exceptions;
 
-import com.api.restmusicservice.wrappers.ResponseData;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -13,7 +12,7 @@ import lombok.Data;
  */
 @AllArgsConstructor
 @Data
-public class ErrorResponse implements ResponseData {
+public class ErrorResponse{
     private String exception;
     private String message;
 }

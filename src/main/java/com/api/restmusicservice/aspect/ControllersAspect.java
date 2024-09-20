@@ -7,6 +7,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+
 @Slf4j
 @Component
 @Aspect
@@ -23,16 +25,23 @@ public class ControllersAspect {
 
         // Получаем параметры метода
         Object[] args = joinPoint.getArgs();
-        // Логируем имя метода и параметры
-        log.info("Вызов метода: " + methodName);
-//        log.info("Параметры метода: " + Arrays.toString(args));
 
-        // Продолжаем выполнение метода
-        Object result = joinPoint.proceed();
+        // Логируем имя метода и параметры до его выполнения
+        log.info("Вызов метода: {} с параметрами: {}", methodName, Arrays.toString(args));
 
+        Object result;
 
-        log.info("Выход из метода: " + methodName);
-        // Возвращаем результат выполнения метода
-        return result;
+        try {
+            // Выполняем метод
+            result = joinPoint.proceed();
+            // Логируем успешный выход из метода
+            log.info("Метод {} выполнен успешно", methodName);
+        } catch (Exception e) {
+            // Логируем исключение
+            log.error("Исключение в методе {}. Причина: {}. Аргументы метода: {}", methodName, e.getMessage(), Arrays.toString(args));
+            throw e;  // Перебрасываем исключение дальше
+        }
+
+        return result;  // Возвращаем результат выполнения метода
     }
 }

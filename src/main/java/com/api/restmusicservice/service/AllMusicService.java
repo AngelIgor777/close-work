@@ -22,7 +22,7 @@ public class AllMusicService {
 
 
     public List<MusicDataDto> getAllMusicByUserId(List<MusicDataDto> musicDataDtoList, String userToken) {
-        ResponseEntity<HashMap> response = restTemplateService.getHashMapLikedMusicResponseEntity(userToken);
+        ResponseEntity<HashMap> response = restTemplateService.getUserLikedMusics(userToken);
 
         HashMap<String, List<Long>> musicsId = response.getBody();
 

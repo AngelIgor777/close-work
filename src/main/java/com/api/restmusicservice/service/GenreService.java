@@ -2,13 +2,10 @@ package com.api.restmusicservice.service;
 
 import com.api.restmusicservice.converterstodto.ConverterMusicData;
 import com.api.restmusicservice.dtos.MusicDataDto;
-import com.api.restmusicservice.dtos.MusicDataDtoList;
 import com.api.restmusicservice.entity.MusicData;
-import com.api.restmusicservice.exceptions.ErrorResponse;
 import com.api.restmusicservice.exceptions.MusicDataNotFoundException;
 import com.api.restmusicservice.repository.MusicDataRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
@@ -30,12 +27,10 @@ public class GenreService {
     /**
      * Получает список музыкальных данных по заданному жанру.
      *
-     * <p>Если жанр действителен, возвращает список объектов {@link MusicDataDto} обёрнутых в {@link MusicDataDtoList}.
+     * <p>Если жанр действителен, возвращает список объектов {@link MusicDataDto}
      * Если жанр недействителен, возвращает ошибку {@link MusicDataNotFoundException}.</p>
      *
      * @param genre жанр музыки для поиска. Должен быть одним из следующих: "popular", "rap", "pop", "club", "classic", "instrumental", "rock", "tiktok".
-     * @return {@link ResponseEntity} с объектом {@link MusicDataDtoList} и HTTP статусом {@code 200 OK} при успешном выполнении запроса,
-     * либо с объектом {@link ErrorResponse} и HTTP статусом {@code 404 Not Found} при ошибке.
      * @throws MusicDataNotFoundException если жанр недействителен.
      */
     public List<MusicDataDto> getMusicDataDtosByGenreName(String genre) {
@@ -58,9 +53,6 @@ public class GenreService {
 
     /**
      * Получает список музыкальных данных по названию жанра.
-     *
-     * <p>Преобразует сущности {@link MusicData} в объекты {@link MusicDataDto}.</p>
-     *
      * @param genreName название жанра для поиска.
      * @return список объектов {@link MusicDataDto} для указанного жанра.
      * @throws MusicDataNotFoundException если не найдено данных для указанного жанра.

@@ -19,7 +19,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler(InvalidPageRequestException.class)
+    @ExceptionHandler({InvalidPageRequestException.class, NoContainsKeyException.class})
     public ResponseEntity<String> handleInvalidPageRequestException(InvalidPageRequestException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
@@ -27,10 +27,5 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MusicDataNotFoundException.class)
     public ResponseEntity<String> handleMusicNotFoundException(MusicDataNotFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(NoContainsKeyException.class)
-    public ResponseEntity<String> handleNoContainsKeyException(NoContainsKeyException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

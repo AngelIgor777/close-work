@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +14,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserMusicService {
-    private final RestTemplate restTemplate;
     private final TrackService trackService;
     private final RestTemplateService restTemplateService;
     private final LikedMusicService likedMusicService;
@@ -23,8 +21,8 @@ public class UserMusicService {
     @Value("${url-For-Show-Liked-MusicId}")
     String urlForShowLikedMusicId;
 
-    public ArrayList<MusicDataDto> getUserMusicByUserId(List<MusicDataDto> musicDataDtoList, String userToken) {
-        ResponseEntity<HashMap> likedMusicsIdList = restTemplateService.getHashMapLikedMusicResponseEntity(userToken);
+    public ArrayList<MusicDataDto> getUserMusicListByUserId(List<MusicDataDto> musicDataDtoList, String userToken) {
+        ResponseEntity<HashMap> likedMusicsIdList = restTemplateService.getUserLikedMusics(userToken);
 
         HashMap<String, List<Long>> musicsId = likedMusicsIdList.getBody();
 
@@ -37,7 +35,16 @@ public class UserMusicService {
         return musicDataDtos;
     }
 
-    public List<MusicDataDto> getMusicsByMusicsId(List<Long> musicsId) {
+
+    public void setUserMusicByUserId(MusicDataDto musicDataDto, String userToken) {
+        HashMap userLikedMusics = restTemplateService.getUserLikedMusics(userToken).getBody();
+        ArrayList<Long> likedMusics = (ArrayList<Long>) likedMusicService.getUserLikedMusics(userLikedMusics);
+        if (likedMusics.contains(musicDataDto)) {
+            musicDataDto.setStateLike(true);
+        }
+    }
+
+    public List<MusicDataDto> getMusicsDataByMusicsId(List<Long> musicsId) {
         List<MusicDataDto> musicDataDtoList = musicsId.stream()
                 .map(trackService::getTrackById).toList();
         if (musicDataDtoList.isEmpty()) {

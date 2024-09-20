@@ -6,7 +6,6 @@ import com.api.restmusicservice.dtos.MusicDataDtoList;
 import com.api.restmusicservice.entity.MusicData;
 import com.api.restmusicservice.repository.MusicDataRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -32,8 +31,7 @@ public class SearchService {
      * Результаты преобразуются в объекты {@link MusicDataDto} и возвращаются в виде {@link MusicDataDtoList}.</p>
      *
      * @param query строка запроса для поиска. Может содержать фрагменты имени исполнителя или названия трека.
-     * @return {@link ResponseEntity} с объектом {@link MusicDataDtoList} и HTTP статусом {@code 200 OK}.
-     * Если нет результатов, возвращается пустой список.
+     * @return  {@link MusicDataDtoList}
      */
     public List<MusicDataDto> searchMusic(String query) {
         List<MusicData> musicDataByArtistContainingIgnoreCase =

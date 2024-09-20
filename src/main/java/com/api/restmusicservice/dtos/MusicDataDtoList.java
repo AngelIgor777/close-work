@@ -1,6 +1,5 @@
 package com.api.restmusicservice.dtos;
 
-import com.api.restmusicservice.wrappers.ResponseData;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Builder;
 import lombok.Setter;
@@ -13,7 +12,7 @@ import java.util.List;
  */
 @Setter
 @Builder
-public class MusicDataDtoList implements ResponseData {
+public class MusicDataDtoList {
 
     private List<MusicDataDto> musicDataDtos;
 

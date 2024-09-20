@@ -19,7 +19,7 @@ public class RestTemplateService {
     @Value("${url-For-Show-Liked-MusicId}")
     String urlForShowLikedMusicId;
 
-    public ResponseEntity<HashMap> getHashMapLikedMusicResponseEntity(String userToken) {
+    public ResponseEntity<HashMap> getUserLikedMusics(String userToken) {
         HttpHeaders headers = new HttpHeaders();
 
         headers.setBearerAuth(userToken);  // Добавление заголовка Authorization: Bearer {token}

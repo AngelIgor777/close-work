@@ -11,24 +11,39 @@ import java.util.List;
 @Service
 public class LikedMusicService {
 
-    public  ArrayList<MusicDataDto> extractLikedMusic(List<MusicDataDto> musicDataDtoList, HashMap<String, List<Long>> musicsId) {
+    public ArrayList<MusicDataDto> extractLikedMusic(List<MusicDataDto> musicDataDtoList,
+                                                     HashMap<String, List<Long>> musicsId) {
+        List<Long> musicsIdList = getUserLikedMusics(musicsId);
+
+        // Обновляем stateLike для музыки в переданном списке
+        setStateLikeToUserMusicList(musicDataDtoList, musicsIdList);
+        return new ArrayList<>(musicDataDtoList);
+    }
+
+    public List<Long> getUserLikedMusics(HashMap<String, List<Long>> musicsId) {
         String keyForMusics = "likedMusicsId";
         if (!musicsId.containsKey(keyForMusics)) {
             throw new NoContainsKeyException("Ключа " + keyForMusics + " не найдено");
         }
         // Извлекаем список ID понравившейся музыки
         List<Long> musicsIdList = musicsId.get(keyForMusics);
-
-        // Обновляем stateLike для музыки в переданном списке
-        setStateLikeToUserMusic(musicDataDtoList, musicsIdList);
-        return new ArrayList<>(musicDataDtoList);
+        return musicsIdList;
     }
 
-    public  void setStateLikeToUserMusic(List<MusicDataDto> musicDataDtoList, List<Long> musicsIdList) {
+    public void setStateLikeToUserMusicList(List<MusicDataDto> musicDataDtoList, List<Long> musicsIdList) {
         for (MusicDataDto musicDataDto : musicDataDtoList) {
             if (musicsIdList.contains(musicDataDto.getSoundid().intValue())) {
                 musicDataDto.setStateLike(true); // Устанавливаем лайк
             }
         }
     }
+
+
+//    public  void setStateLikeToUserMusic(List<MusicDataDto> musicDataDtoList, List<Long> musicsIdList) {
+//        for (MusicDataDto musicDataDto : musicDataDtoList) {
+//            if (musicsIdList.contains(musicDataDto.getSoundid().intValue())) {
+//                musicDataDto.setStateLike(true); // Устанавливаем лайк
+//            }
+//        }
+//    }
 }

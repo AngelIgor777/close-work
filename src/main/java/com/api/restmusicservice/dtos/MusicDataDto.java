@@ -1,6 +1,5 @@
 package com.api.restmusicservice.dtos;
 
-import com.api.restmusicservice.wrappers.ResponseData;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,7 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
-public class MusicDataDto implements ResponseData {
+public class MusicDataDto{
     private Long soundid;
     private String playerSoundId = "";
     private Boolean stateLike;

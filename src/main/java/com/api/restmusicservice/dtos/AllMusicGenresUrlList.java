@@ -1,7 +1,6 @@
 package com.api.restmusicservice.dtos;
 
 import com.api.restmusicservice.entity.AllMusicGenresUrl;
-import com.api.restmusicservice.wrappers.ResponseData;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Setter;
 
@@ -12,7 +11,7 @@ import java.util.List;
  * <p>Используется для ограничения возвращаемого типа в {@code ResponseEntity<ResponseData>}</p>
  */
 @Setter
-public class AllMusicGenresUrlList implements ResponseData {
+public class AllMusicGenresUrlList  {
 
     private List<AllMusicGenresUrl> allMusicGenresUrls;
 

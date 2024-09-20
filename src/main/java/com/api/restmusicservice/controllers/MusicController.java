@@ -58,7 +58,7 @@ public class MusicController {
 
         List<MusicDataDto> musicDataDtosByGenreName = genreService.getMusicDataDtosByGenreName(genre);
 
-        return userMusicService.getUserMusicByUserId(musicDataDtosByGenreName, userToken);
+        return userMusicService.getUserMusicListByUserId(musicDataDtosByGenreName, userToken);
     }
 
 
@@ -73,13 +73,18 @@ public class MusicController {
      * @throws com.api.restmusicservice.exceptions.MusicDataNotFoundException если трек с указанным идентификатором не найден.
      */
     @GetMapping("/track/{id}")
-    public MusicDataDto getMusicById(@PathVariable("id") Long id) {
-        return trackService.getTrackById(id);
+    public MusicDataDto getMusicById(@RequestHeader("Authorization") String token, @PathVariable("id") Long id) {
+
+        // Извлекаем токен без префикса "Bearer "
+        String userToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+        MusicDataDto trackById = trackService.getTrackById(id);
+        userMusicService.setUserMusicByUserId(trackById, userToken);
+        return trackById;
     }
 
     @PostMapping("/musicsById")
     public List<MusicDataDto> getMusicsById(@RequestBody List<Long> musicsId) {
-        return userMusicService.getMusicsByMusicsId(musicsId);
+        return userMusicService.getMusicsDataByMusicsId(musicsId);
     }
 
     /**
@@ -100,18 +105,24 @@ public class MusicController {
      * Выполняет поиск музыки по заданному запросу.
      *
      * <p>Этот метод возвращает список объектов {@link com.api.restmusicservice.dtos.MusicDataDto}
-     * соответствующих запросу. Если данных нет, возвращается пустой список.</p>
+     * соответствующих запросу. Если данных нет, возвращается ошибка 404</p>
      *
      * @param query строка запроса для поиска музыки. Может содержать имя исполнителя, название песни и т.д.
      * @return объект {@code ResponseEntity<ResponseData>} с результатами поиска. В случае отсутствия данных возвращается пустой список.
+     * @throws MusicDataNotFoundException - ошибка возникает в случае пустого списка
      */
     @GetMapping("/findMusic/{query}")
-    public List<MusicDataDto> getMusicByQuery(@PathVariable("query") String query) {
+    public List<MusicDataDto> getMusicByQuery(@RequestHeader("Authorization") String token,
+                                              @PathVariable("query") String query) {
+
+        // Извлекаем токен без префикса "Bearer "
+        String userToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+
         List<MusicDataDto> musicDataDtos = searchService.searchMusic(query);
         if (musicDataDtos.isEmpty()) {
             throw new MusicDataNotFoundException("По запросу ничего не найдено");
         }
-        return musicDataDtos;
+        return userMusicService.getUserMusicListByUserId(musicDataDtos, userToken);
     }
 
     @GetMapping("/music/allMusicGenres")
@@ -146,8 +157,9 @@ public class MusicController {
         int start = Math.min(page * size, allMusicByUserId.size());
         int end = Math.min(start + size, allMusicByUserId.size());
 
+        List<MusicDataDto> musicDataDtos = allMusicByUserId.subList(start, end);
         // Возвращаем нужную страницу
-        return allMusicByUserId.subList(start, end);
+        return userMusicService.getUserMusicListByUserId(musicDataDtos, userToken);
     }
 
 }
